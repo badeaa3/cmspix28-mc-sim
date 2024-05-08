@@ -23,11 +23,10 @@ if __name__ == "__main__":
     tracks = [] # cota cotb p flp localx localy pT
 
     # load the root files
-    # files = "/local/d1/badea/tracker/smartpix/simulation/outdir/cmsMatch/10/*.root"
     tree = "Delphes"
     delphes_track_pt = []
     delphes_particle_pt = []
-    branches = ["Track.PID", "Track.PT", "Track.P", "Track.Eta", "Track.Phi", "Track.XOuter", "Track.YOuter"]
+    branches = ["Track.PID", "Track.PT", "Track.P", "Track.CtgTheta", "Track.Phi", "Track.XOuter", "Track.YOuter"]
     pionPID = 211 # plus/minus
 
     # for array in uproot.iterate(f"{files}:{tree}", branches):
@@ -45,13 +44,12 @@ if __name__ == "__main__":
             temp[branch] = temp[branch][cut]
         
         # track properties
-        # based on the image here https://github.com/kdp-lab/pixelav/blob/ppixelav2v2/ppixelav2_operating_inst.pdf
-        cota = 1./np.tan(temp["Track.Phi"]) # phi = alpha - pi -> cot(alpha) = cot(phi+pi) = cot(phi) = 1/tan(phi)
-        cotb = 1./np.tan(temp["Track.Eta"]) # should be theta but need to get get it # theta = beta - pi -> cot(beta) = cot(theta+pi) = cot(theta) = 1/tan(theta)
+        cota = temp["Track.CtgTheta"] # alpha ~ polar angle ~ theta
+        cotb = 1./np.tan(temp["Track.Phi"]) # beta ~ azimuthal angle ~ phi
         p = temp["Track.P"] # [GeV]
         flp = np.zeros(p.shape)
-        localx = temp["Track.XOuter"] # [mm]
-        localy = temp["Track.YOuter"] # [mm]
+        localx = temp["Track.YOuter"] # [mm]. flipped on purpose to match pixelAV sensor geometry
+        localy = temp["Track.XOuter"] # [mm]
         pT = temp["Track.PT"] # [GeV]
         tracks.append([cota, cotb, p, flp, localx, localy, pT])
 

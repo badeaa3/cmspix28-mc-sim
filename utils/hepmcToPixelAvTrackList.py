@@ -4,6 +4,14 @@ Date: December 31, 2023
 Purpose: Convert hepmc output to track list input for PixelAV
 '''
 
+''' 
+NOTE: THIS FILE HAS NOT BEEN UPDATED LIKE the delphesRootToPixelAvTrackList.py file. 
+TO USE IT ONE NEEDS TO UPDATE:
+- the accept boolean of which particles to keep
+- alpha = polar angle, beta = azimuthal angle, localx = y, localy = x to agree with the pixelAV sensor geometry
+'''
+
+
 import pyhepmc
 import numpy as np
 import argparse
