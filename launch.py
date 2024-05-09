@@ -11,6 +11,7 @@ import argparse
 import submitit
 from pathlib import Path
 import json 
+import random
 
 def run_executable(executable_path, options):
     command = [executable_path] + options
@@ -23,7 +24,6 @@ def run_commands(commands):
             subprocess.run(command[1:], cwd=command[0])
         else:
             subprocess.run(command)
-    
 
 if __name__ == "__main__":
 
@@ -35,6 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--pixelAVdir", help="pixelAV directory", default="./pixelav/")
     parser.add_argument("--mode", help="Options: local, slurm", default="local")
     parser.add_argument("--query", help="path to json file containing query", default=None)
+    parser.add_argument("--njobs", help="number of jobs to actually launch. default is all", default=-1, type=int)
     args = parser.parse_args()
 
     # get absolute path and check if outdir exists
@@ -57,6 +58,9 @@ if __name__ == "__main__":
         # format
         outFileName = Path(outDir, f"minbias_{pTHatMin:.2f}_{pTHatMax:.2f}_GeV").resolve()
 
+        # just say hi
+        hi = ["echo", "hi"]
+
         # pythia
         pythiaExe = Path("./bin/minbias.exe").resolve()
         pythia = [pythiaExe, outFileName, args.maxEvents, str(pTHatMin), str(pTHatMax)]
@@ -78,11 +82,17 @@ if __name__ == "__main__":
         pixelavOut = f"{outFileName}.out".replace("pythia", "pixelavOut")
         pixelavSeedFile = f"{outFileName}_seed".replace("pythia", "pixelavOut")
         pixelAV = [args.pixelAVdir, "./bin/ppixelav2_list_trkpy_n_2f.exe", "1", pixelavIn, pixelavOut, pixelavSeedFile]
-        print(pixelAV)
         
-        # add to configurations
-        # confs.append([(pythia, delphes, trackList, pixelAV),]) # weird formatting is because pool expects a tuple at input
-        confs.append([(trackList, pixelAV),])
+        # create configuration
+        conf = (hi, hi) # (pythia, delphes, trackList, pixelAV)
+
+        # make the format correct for submission
+        if args.mode == "local":
+            confs.append([conf,]) # weird formatting is because pool expects a tuple at input
+        elif args.mode == "slurm":
+            confs.append(conf)
+
+    print(confs)
 
     # multiprocessing (single or multiple core) submission
     if args.mode == "local":
@@ -128,5 +138,5 @@ if __name__ == "__main__":
                     continue
                 
                 print(conf)
-                job = executor.submit(run_commands, **conf)
+                job = executor.submit(run_commands, conf)
                 jobs.append(job)
