@@ -26,6 +26,7 @@ if __name__ == "__main__":
     tree = "Delphes"
     delphes_track_pt = []
     delphes_particle_pt = []
+    # delphes branch definitions can be found here https://cp3.irmp.ucl.ac.be/projects/delphes/wiki/WorkBook/RootTreeDescription
     branches = ["Track.PID", "Track.PT", "Track.P", "Track.CtgTheta", "Track.Phi", "Track.XOuter", "Track.YOuter"]
     pionPID = 211 # plus/minus
 
