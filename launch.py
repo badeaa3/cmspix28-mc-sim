@@ -81,10 +81,10 @@ if __name__ == "__main__":
         pixelavIn = trackListOut
         pixelavOut = f"{outFileName}.out".replace("pythia", "pixelavOut")
         pixelavSeedFile = f"{outFileName}_seed".replace("pythia", "pixelavOut")
-        pixelAV = [args.pixelAVdir, "./bin/ppixelav2_list_trkpy_n_2f.exe", "1", pixelavIn, pixelavOut, pixelavSeedFile]
+        pixelAV = [str(Path(args.pixelAVdir).resolve()), "./bin/ppixelav2_list_trkpy_n_2f.exe", "1", pixelavIn, pixelavOut, pixelavSeedFile]
         
         # create configuration
-        conf = (hi, hi) # (pythia, delphes, trackList, pixelAV)
+        conf = (hi, pixelAV) # (pythia, delphes, trackList, pixelAV)
 
         # make the format correct for submission
         if args.mode == "local":
