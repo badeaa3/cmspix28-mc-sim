@@ -20,11 +20,12 @@ def run_executable(executable_path, options):
 def run_commands(commands):
     for command in commands:
         print(command)
+        # launch jobs
         if "pixelav" in command[0]:
             subprocess.run(command[1:], cwd=command[0])
         else:
             subprocess.run(command)
-
+        
 if __name__ == "__main__":
 
     # user options
@@ -78,14 +79,15 @@ if __name__ == "__main__":
         trackList = ["python3", "utils/delphesRootToPixelAvTrackList.py", "-i", trackListIn, "-o", trackListOut]
 
         # pixelAV
+        pixelavPath = Path(args.pixelAVdir).resolve()
         pixelavIn = trackListOut
         pixelavOut = f"{outFileName}.out".replace("pythia", "pixelavOut")
         pixelavSeedFile = f"{outFileName}_seed".replace("pythia", "pixelavOut")
-        pixelAV = [str(Path(args.pixelAVdir).resolve()), "./bin/ppixelav2_list_trkpy_n_2f.exe", "1", pixelavIn, pixelavOut, pixelavSeedFile]
-        
+        pixelAV = [str(pixelavPath), "./bin/ppixelav2_list_trkpy_n_2f.exe", "1", pixelavIn, pixelavOut, pixelavSeedFile]
+
         # create configuration
         conf = (hi, pixelAV) # (pythia, delphes, trackList, pixelAV)
-
+        
         # make the format correct for submission
         if args.mode == "local":
             confs.append([conf,]) # weird formatting is because pool expects a tuple at input
@@ -136,7 +138,7 @@ if __name__ == "__main__":
                 # only launch a single job
                 if args.njobs != -1 and (iC+1) > args.njobs:
                     continue
-                
+                        
                 print(conf)
                 job = executor.submit(run_commands, conf)
                 jobs.append(job)
